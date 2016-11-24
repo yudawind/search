@@ -1,0 +1,85 @@
+/*! Googl OpenSans */
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+@import "normalize";
+/*! Layout */
+html,body {
+  height: 100%;
+
+}
+body {
+  background: #434753;
+  font-family: 'Open Sans', sans-serif;
+}
+body .site {
+  position: relative;
+  padding: 106px 0 120px 0;
+  background: white;
+  min-height: ~"calc(100% - 226px)";
+  font-size: 14px;
+}
+header, footer {
+  position: absolute;
+  width: 100%;
+  color: white;
+}
+header {
+  top: 0;
+  height: 54px;
+  padding: 3px 0;
+  border-bottom: 3px solid #2f323b;
+  background: #434753;
+}
+footer {
+  bottom: 0;
+  height: 68px;
+  padding: 6px 0;
+  background: #2f323b;
+}
+main {
+  .search {
+    text-align: center;
+    input {
+      border-radius: 4px;
+      border: 1px solid grey;
+      height: 28px;
+      width: 448px;
+      box-shadow: inset 1px 1px 1px 1px rgba(0,0,0,.2);
+      background: #f2f2f2;
+      padding: 4px 10px;
+    }
+  }
+}
+.cont {
+  width: 920px;
+  margin: 0 auto;
+  padding: 4px 0;
+
+}
+/*! nav */
+nav {
+  text-align: center;
+  padding: 20px;
+  a {
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 20px 45px;
+    color: white;
+  }
+}
+/*! result */
+#result {
+  padding-top: 15px;
+  li {
+    list-style: none;
+  }
+  h2 {
+    margin: 25px 0 0;
+    color: #5a5e6c;
+    font-weight: 100;
+    font-size: 16px;
+  }
+  p {
+    margin: 0;
+    color: #d4d4d4;
+  }
+}
