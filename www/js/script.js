@@ -1,61 +1,60 @@
-$(document).ready(function () {
-    $('#search').keyup(function() {
-        srch = $('#search').val(); // строка из поиска
-        srch = srch.replace(/"/g, '');
-        srcharr = srch.split(' '); // масив из слов поиска
-        srchmin = [];
-        for (b=0;b<srcharr.length;b++){// масив с исключениями
-            srcharr[b] += '';
-            vrr = srcharr[b].charAt(0);
-            trr = [];
-            if (vrr == '-'){
-                srcharr[b]=srcharr[b].replace(/-/, '');
-                srchmin.push(srcharr[b]);
-                trr.push(b);
-                srcharr.splice(b,1);
-                b--;
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search');
+    const resultEl = document.getElementById('result');
+    let players = [];
+
+    async function loadPlayers() {
+        try {
+            const resp = await fetch('players.json');
+            players = await resp.json();
+        } catch (err) {
+            console.error('Failed to load players.json', err);
+        }
+    }
+
+    loadPlayers();
+
+    searchInput.addEventListener('input', () => {
+        const raw = searchInput.value.replace(/"/g, '');
+        const words = raw.split(' ').filter(Boolean);
+        const negatives = [];
+        const terms = [];
+
+        for (const w of words) {
+            if (w.startsWith('-')) {
+                negatives.push(w.slice(1));
+            } else {
+                terms.push(w);
             }
         }
-        if (srch != ''){ //обнуляем результат
-            $.getJSON("players.json", function(data){ //получаем данные с сервера
-                var items = [];
-                for (i=0;i<data.length;i++){ // формируем результаты
-                    val = data[i];
-                    strdpsk = (val['name']+' '+val['position']+' '+val['nationality']+' '+val['id']+' '+val['jerseyNumber']+' '+val['dateOfBirth']+' '+val['contractUntil']+' '+val['marketValue']);
-                    per = 0;
-                    for (c=0;c<srchmin.length;c++){ // исключаем минус слова
-                        myRe = new RegExp(srchmin[c],'ig');
-                        if (myRe.exec(strdpsk)){
-                            per = 1;
-                            break;
-                        }
-                    }
-                    if (per == 1) continue;
-                    genstrok = '';
-                    for (c=0;c<srcharr.length;c++){ // формируем список ответов
-                        myRe = new RegExp(srcharr[c],'ig');
-                        if (myRe.exec(strdpsk)){
-                            if (c==0) genstrok = '<li>'+
-                                '<h2>'+val['name']+'</h2>'+
-                                '<p>'+'<b> id: </b>'+val['id']+
-                                '<b> nationality: </b>'+val['nationality']+
-                                '<b> position: </b>'+val['position']+
-                                '<br>'+'<b>marketValue: </b>'+val['marketValue']+
-                                '<b> id: </b>'+val['id']+
-                                '<br>'+'<b>jerseyNumber: </b>'+val['jerseyNumber']+
-                                '<b> dateOfBirth: </b>'+val['dateOfBirth']+
-                                '<br>'+'<b>contractUntil: </b>'+val['contractUntil']+
-                                '</p>'+'</li>';
-                        } else {
-                            genstrok = '';
-                            break;
-                        }
-                    }
-                    items.push(genstrok);
+
+        if (!raw.trim()) {
+            resultEl.innerHTML = '';
+            return;
+        }
+
+        const items = [];
+        for (const val of players) {
+            const str = `${val.name} ${val.position} ${val.nationality} ${val.id} ${val.jerseyNumber} ${val.dateOfBirth} ${val.contractUntil} ${val.marketValue}`;
+            if (negatives.some(n => new RegExp(n, 'i').test(str))) continue;
+
+            let matched = true;
+            for (const t of terms) {
+                if (!new RegExp(t, 'i').test(str)) {
+                    matched = false;
+                    break;
                 }
-                spisok = $('<ul/>', {'class': 'my-new-list', html: items.join('')});
-                $('#result').html(spisok); // вставляем на страницу
-            });
-        } else $('#result').html(''); // очищаем результат если поиск пустой
+            }
+            if (matched) {
+                items.push(
+                    `<li>
+                        <h2>${val.name}</h2>
+                        <p><b> id: </b>${val.id}<b> nationality: </b>${val.nationality}<b> position: </b>${val.position}<br><b>marketValue: </b>${val.marketValue}<b> id: </b>${val.id}<br><b>jerseyNumber: </b>${val.jerseyNumber}<b> dateOfBirth: </b>${val.dateOfBirth}<br><b>contractUntil: </b>${val.contractUntil}</p>
+                    </li>`
+                );
+            }
+        }
+
+        resultEl.innerHTML = items.length ? `<ul class="my-new-list">${items.join('')}</ul>` : '';
     });
 });

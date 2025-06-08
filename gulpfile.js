@@ -1,36 +1,29 @@
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var less = require('gulp-less');
-var watch = require('gulp-watch');
-var rename = require('gulp-rename');
-var postcss = require('gulp-postcss');
-var autoprefixer = require('autoprefixer');
-var cssnano = require('cssnano');
+const { src, dest, watch, series } = require('gulp');
+const less = require('gulp-less');
+const rename = require('gulp-rename');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+const cssnano = require('cssnano');
 
-var paths = {
-    css:['less/**/*.less']
+const paths = {
+    css: 'less/**/*.less'
 };
 
-gulp.task('css', function () {
-    var processor = [
-        autoprefixer({browsers: ['last 2 version']}),
+function css() {
+    const processor = [
+        autoprefixer({ overrideBrowserslist: ['last 2 versions'] }),
         cssnano()
     ];
-    return gulp.src('less/template.less')
+    return src('less/template.less')
         .pipe(less())
         .pipe(postcss(processor))
         .pipe(rename('style.css'))
-        .pipe(gulp.dest('www'))
-        .on('error', gutil.log);
+        .pipe(dest('www'));
+}
 
-});
+function watcher() {
+    watch(paths.css, css);
+}
 
-
-gulp.task('watcher',function(){
-    gulp.watch(paths.css, ['css']);
-});
-
-gulp.task('default', [
-    'css',
-    'watcher'
-]);
+exports.css = css;
+exports.default = series(css, watcher);
